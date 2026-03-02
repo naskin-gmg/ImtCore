@@ -56,12 +56,30 @@ goto :main
         call :print_info "Initializing git repository..."
         git init
         
+        :: Set up Git LFS for large binary files
+        call :print_info "Configuring Git LFS..."
+        git lfs install
+        
+        :: Track large binary file types with LFS
+        git lfs track "*.dll"
+        git lfs track "*.lib"
+        git lfs track "*.pyd"
+        git lfs track "*.so"
+        git lfs track "*.dylib"
+        git lfs track "*.exe"
+        git lfs track "*.a"
+        
         :: Create README if it doesn't exist
         if not exist "README.md" (
             call :create_readme "%lib_name%" > README.md
         )
         
-        :: Add all files
+        :: Add .gitattributes first (created by git lfs track)
+        if exist ".gitattributes" (
+            git add .gitattributes
+        )
+        
+        :: Add all files (LFS files will be handled automatically)
         git add .
         
         :: Create initial commit with multi-line message
@@ -69,6 +87,8 @@ goto :main
         echo. >> commit_msg.txt
         echo This library was extracted from the ImtCore repository to enable >> commit_msg.txt
         echo independent version control and easier dependency management. >> commit_msg.txt
+        echo. >> commit_msg.txt
+        echo Configured with Git LFS for large binary files. >> commit_msg.txt
         echo. >> commit_msg.txt
         echo Source: ImagingTools/ImtCore/3rdParty/!lib_name! >> commit_msg.txt
         git commit -F commit_msg.txt
@@ -99,12 +119,23 @@ goto :main
     echo This library was extracted from the ImtCore repository (^`3rdParty/%lib_name%^`) 
     echo to enable independent version control and easier dependency management.
     echo.
+    echo **Note**: This repository uses **Git LFS** (Large File Storage) for binary files (*.dll, *.lib, *.so, *.exe, etc.). Make sure you have Git LFS installed before cloning.
+    echo.
     echo ## Usage
     echo.
     echo This repository is integrated into ImtCore as a git submodule:
     echo.
     echo ^`^`^`bash
     echo git submodule add https://github.com/%GITHUB_ORG%/%lib_name%.git 3rdParty/%lib_name%
+    echo ^`^`^`
+    echo.
+    echo ## Cloning
+    echo.
+    echo To clone this repository with LFS files:
+    echo.
+    echo ^`^`^`bash
+    echo git lfs install  # If not already installed
+    echo git clone https://github.com/%GITHUB_ORG%/%lib_name%.git
     echo ^`^`^`
     echo.
     echo ## Updating

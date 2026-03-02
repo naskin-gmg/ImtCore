@@ -2,6 +2,7 @@
 
 ## Prerequisites
 - [ ] Git installed and configured
+- [ ] **Git LFS installed**: `git lfs install` (required for large binaries)
 - [ ] GitHub CLI (`gh`) authenticated: `gh auth login`
 - [ ] Admin access to ImagingTools organization
 - [ ] Review ACTION_REQUIRED.md

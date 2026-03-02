@@ -50,6 +50,24 @@ Repositories should be named under the `ImagingTools` organization:
 
 ## Migration Steps
 
+### Important: Git LFS Requirement
+
+**All library repositories must be configured with Git LFS** (Large File Storage) to properly handle large binary files.
+
+The following file types in the 3rdParty directory are tracked with Git LFS:
+- `*.dll` - Windows dynamic libraries
+- `*.lib` - Windows static libraries  
+- `*.pyd` - Python extension modules
+- `*.so` - Linux shared objects
+- `*.dylib` - macOS dynamic libraries
+- `*.exe` - Executable files
+- `*.a` - Static archives
+
+**Prerequisites:**
+- Install Git LFS from https://git-lfs.github.com/
+- Run `git lfs install` after installation
+- The migration scripts automatically configure LFS for each repository
+
 ### Step 1: Create GitHub Repositories
 
 For each library in the list above:
@@ -74,8 +92,21 @@ Use the provided migration script `migrate-3rdparty.sh` to:
 # Example for EJ library
 cd 3rdParty/EJ
 git init
+
+# Configure Git LFS
+git lfs install
+git lfs track "*.dll"
+git lfs track "*.lib"
+git lfs track "*.pyd"
+git lfs track "*.so"
+git lfs track "*.dylib"
+git lfs track "*.exe"
+git lfs track "*.a"
+
+# Add and commit files
+git add .gitattributes
 git add .
-git commit -m "Initial commit of EJ library"
+git commit -m "Initial commit of EJ library with Git LFS support"
 git remote add origin https://github.com/ImagingTools/EJ.git
 git push -u origin main
 ```

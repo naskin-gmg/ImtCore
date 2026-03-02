@@ -5,6 +5,7 @@ This guide provides detailed instructions for migrating the 3rdParty libraries t
 ## Prerequisites
 
 - Git installed and configured
+- **Git LFS installed** (required for large binary files)
 - Access to create repositories in the `ImagingTools` GitHub organization
 - GitHub credentials configured (SSH or HTTPS)
 

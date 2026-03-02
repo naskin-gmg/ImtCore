@@ -27,6 +27,16 @@ The following preparation work has been completed:
 
 The following steps require **GitHub organization permissions** and must be completed manually:
 
+### Prerequisites
+
+- **Git LFS** must be installed on your system
+  - Download from: https://git-lfs.github.com/
+  - Or install via package manager:
+    - macOS: `brew install git-lfs`
+    - Ubuntu/Debian: `apt-get install git-lfs`
+    - Windows: Download installer from website
+  - After install: `git lfs install`
+
 ### Step 1: Create GitHub Repositories
 
 You need to create 17 new repositories under the `ImagingTools` organization:

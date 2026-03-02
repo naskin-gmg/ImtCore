@@ -80,12 +80,30 @@ prepare_library_repo() {
         print_info "Initializing git repository..."
         git init
         
+        # Set up Git LFS for large binary files
+        print_info "Configuring Git LFS..."
+        git lfs install
+        
+        # Track large binary file types with LFS
+        git lfs track "*.dll"
+        git lfs track "*.lib"
+        git lfs track "*.pyd"
+        git lfs track "*.so"
+        git lfs track "*.dylib"
+        git lfs track "*.exe"
+        git lfs track "*.a"
+        
         # Create README if it doesn't exist
         if [ ! -f "README.md" ]; then
             create_readme "${lib_name}" > README.md
         fi
         
-        # Add all files
+        # Add .gitattributes first (created by git lfs track)
+        if [ -f ".gitattributes" ]; then
+            git add .gitattributes
+        fi
+        
+        # Add all files (LFS files will be handled automatically)
         git add .
         
         # Create initial commit
@@ -93,6 +111,8 @@ prepare_library_repo() {
 
 This library was extracted from the ImtCore repository to enable
 independent version control and easier dependency management.
+
+Configured with Git LFS for large binary files.
 
 Source: ImagingTools/ImtCore/3rdParty/${lib_name}"
         
@@ -123,12 +143,23 @@ This repository contains the **${lib_name}** library used by ImtCore.
 This library was extracted from the ImtCore repository (\`3rdParty/${lib_name}\`) 
 to enable independent version control and easier dependency management.
 
+**Note**: This repository uses **Git LFS** (Large File Storage) for binary files (*.dll, *.lib, *.so, *.exe, etc.). Make sure you have Git LFS installed before cloning.
+
 ## Usage
 
 This repository is integrated into ImtCore as a git submodule:
 
 \`\`\`bash
 git submodule add https://github.com/${GITHUB_ORG}/${lib_name}.git 3rdParty/${lib_name}
+\`\`\`
+
+## Cloning
+
+To clone this repository with LFS files:
+
+\`\`\`bash
+git lfs install  # If not already installed
+git clone https://github.com/${GITHUB_ORG}/${lib_name}.git
 \`\`\`
 
 ## Updating
