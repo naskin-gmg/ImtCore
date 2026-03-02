@@ -14,20 +14,18 @@ echo Adding submodules...
 for %%L in (%LIBRARIES%) do (
     set "repo_url=https://github.com/%GITHUB_ORG%/%%L.git"
     set "submodule_path=3rdParty/%%L"
-    
+ECHO is off.
     echo Adding %%L...
-    git submodule add "!repo_url!" "!submodule_path!"
+    git submodule add "^" "^"
 )
 
 echo Initializing and updating submodules...
 git submodule init
 git submodule update
 
-echo Done! All submodules added.
-echo.
-echo IMPORTANT: Don't forget to commit the changes:
+echo Done All submodules added.
+echo Don't forget to commit the changes:
 echo   git add .
 echo   git commit -m "Convert 3rdParty libraries to git submodules"
-echo   git push
 
 endlocal
