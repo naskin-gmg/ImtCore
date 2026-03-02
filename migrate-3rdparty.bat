@@ -65,19 +65,19 @@ goto :main
         git add .
         
         :: Create initial commit with multi-line message
-        echo Initial commit of %lib_name% library from ImtCore/3rdParty > commit_msg.txt
+        echo Initial commit of !lib_name! library from ImtCore/3rdParty > commit_msg.txt
         echo. >> commit_msg.txt
         echo This library was extracted from the ImtCore repository to enable >> commit_msg.txt
         echo independent version control and easier dependency management. >> commit_msg.txt
         echo. >> commit_msg.txt
-        echo Source: ImagingTools/ImtCore/3rdParty/%lib_name% >> commit_msg.txt
+        echo Source: ImagingTools/ImtCore/3rdParty/!lib_name! >> commit_msg.txt
         git commit -F commit_msg.txt
         del commit_msg.txt
         
-        call :print_info "Repository prepared at: %temp_repo%"
+        call :print_info "Repository prepared at: !temp_repo!"
         call :print_info "To push to GitHub, run:"
-        echo   cd %temp_repo%
-        echo   git remote add origin %repo_url%
+        echo   cd !temp_repo!
+        echo   git remote add origin !repo_url!
         echo   git branch -M main
         echo   git push -u origin main
         echo.

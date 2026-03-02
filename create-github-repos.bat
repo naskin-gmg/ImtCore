@@ -81,7 +81,7 @@ goto :main
     gh repo view "%GITHUB_ORG%/%repo_name%" >nul 2>&1
     if not errorlevel 1 (
         call :print_warning "Repository %GITHUB_ORG%/%repo_name% already exists, skipping"
-        exit /b 0
+        exit /b 2
     )
     
     :: Create repository
@@ -107,12 +107,9 @@ goto :main
         set create_result=!errorlevel!
         
         if !create_result! equ 0 (
-            gh repo view "%GITHUB_ORG%/%%L" >nul 2>&1
-            if not errorlevel 1 (
-                set /a success_count+=1
-            ) else (
-                set /a skip_count+=1
-            )
+            set /a success_count+=1
+        ) else if !create_result! equ 2 (
+            set /a skip_count+=1
         ) else (
             set /a fail_count+=1
         )
