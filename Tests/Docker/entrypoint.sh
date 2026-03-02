@@ -261,7 +261,7 @@ if [ "$API_TESTS_FOUND" = true ]; then
     done
 fi
 
-if [ "$RUN_GUI_TESTS" != "true" ] && [ "$RUN_API_TESTS" != "true" ]; then
+if [ "$RUN_GUI_TESTS" = "false" ] && [ "$RUN_API_TESTS" = "false" ]; then
     echo -e "${YELLOW}RUN_GUI_TESTS and RUN_API_TESTS are false - skipping test execution${NC}"
     EXIT_CODE=0
 elif [ "$GUI_TESTS_FOUND" = false ] && [ "$API_TESTS_FOUND" = false ]; then

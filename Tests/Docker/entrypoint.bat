@@ -335,6 +335,7 @@ goto END_TESTS
 
 :SKIP_API_TESTS
 
+if !GUI_TESTS_FOUND! equ 1 goto END_TESTS
 if /I "!RUN_GUI_TESTS!"=="true" goto NO_TESTS_FOUND
 if /I "!RUN_API_TESTS!"=="true" goto NO_TESTS_FOUND
 echo RUN_GUI_TESTS and RUN_API_TESTS are false - skipping test execution
