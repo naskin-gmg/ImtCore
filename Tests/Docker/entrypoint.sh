@@ -19,6 +19,16 @@ YELLOW='\033[1;33m'
 RED='\033[0;31m'
 NC='\033[0m' # No Color
 
+APP_DIR=/app
+STARTUP_DIR="$APP_DIR/startup"
+RESOURCES_DIR="$APP_DIR/resources"
+TESTS_DIR="$APP_DIR/tests"
+GUI_DIR="$TESTS_DIR/GUI"
+API_DIR="$TESTS_DIR/API"
+TEST_RESULTS_DIR="$TESTS_DIR/test-results"
+
+export APP_DIR STARTUP_DIR RESOURCES_DIR TESTS_DIR GUI_DIR API_DIR TEST_RESULTS_DIR
+
 echo -e "${GREEN}========================================${NC}"
 echo -e "${GREEN}Starting Test Environment${NC}"
 echo -e "${GREEN}========================================${NC}"
@@ -153,23 +163,36 @@ fi
 
 echo -e "${YELLOW}Auto-detecting tests...${NC}"
 
+RUN_GUI_TESTS="${RUN_GUI_TESTS:-true}"
+RUN_API_TESTS="${RUN_API_TESTS:-true}"
+
+echo -e "${YELLOW}RUN_GUI_TESTS=${RUN_GUI_TESTS}, RUN_API_TESTS=${RUN_API_TESTS}${NC}"
+
 GUI_TESTS_FOUND=false
 API_TESTS_FOUND=false
 
 # Check for GUI tests (Playwright)
-if [ -d "/app/tests/GUI" ] && [ "$(ls -A /app/tests/GUI 2>/dev/null)" ]; then
-    if find /app/tests/GUI -type f \( -name "*.spec.js" -o -name "*.spec.ts" -o -name "*.test.js" -o -name "*.test.ts" \) | grep -q .; then
-        GUI_TESTS_FOUND=true
-        echo -e "${GREEN}✓ Found Playwright tests in GUI folder${NC}"
+if [ "$RUN_GUI_TESTS" = "true" ]; then
+    if [ -d "/app/tests/GUI" ] && [ "$(ls -A /app/tests/GUI 2>/dev/null)" ]; then
+        if find /app/tests/GUI -type f \( -name "*.spec.js" -o -name "*.spec.ts" -o -name "*.test.js" -o -name "*.test.ts" \) | grep -q .; then
+            GUI_TESTS_FOUND=true
+            echo -e "${GREEN}✓ Found Playwright tests in GUI folder${NC}"
+        fi
     fi
+else
+    echo -e "${YELLOW}RUN_GUI_TESTS=false - skipping Playwright tests${NC}"
 fi
 
 # Check for API tests (Postman/Newman)
-if [ -d "/app/tests/API" ] && [ "$(ls -A /app/tests/API 2>/dev/null)" ]; then
-    if find /app/tests/API -type f -name "*collection*.json" | grep -q .; then
-        API_TESTS_FOUND=true
-        echo -e "${GREEN}✓ Found Postman collections in API folder${NC}"
+if [ "$RUN_API_TESTS" = "true" ]; then
+    if [ -d "/app/tests/API" ] && [ "$(ls -A /app/tests/API 2>/dev/null)" ]; then
+        if find /app/tests/API -type f -name "*collection*.json" | grep -q .; then
+            API_TESTS_FOUND=true
+            echo -e "${GREEN}✓ Found Postman collections in API folder${NC}"
+        fi
     fi
+else
+    echo -e "${YELLOW}RUN_API_TESTS=false - skipping Postman tests${NC}"
 fi
 
 EXIT_CODE=0
@@ -238,8 +261,11 @@ if [ "$API_TESTS_FOUND" = true ]; then
     done
 fi
 
-if [ "$GUI_TESTS_FOUND" = false ] && [ "$API_TESTS_FOUND" = false ]; then
-    echo -e "${YELLOW}No tests found in GUI or API folders${NC}"
+if [ "$RUN_GUI_TESTS" != "true" ] && [ "$RUN_API_TESTS" != "true" ]; then
+    echo -e "${YELLOW}RUN_GUI_TESTS and RUN_API_TESTS are false - skipping test execution${NC}"
+    EXIT_CODE=0
+elif [ "$GUI_TESTS_FOUND" = false ] && [ "$API_TESTS_FOUND" = false ]; then
+    echo -e "${YELLOW}No tests found in enabled GUI or API folders${NC}"
     EXIT_CODE=0
 fi
 
