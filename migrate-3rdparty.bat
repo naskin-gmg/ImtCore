@@ -180,6 +180,7 @@ goto :main
         echo.
         echo echo Done! All submodules added.
         echo echo Don't forget to commit the changes:
+        echo echo   git add .
         echo echo   git commit -m "Convert 3rdParty libraries to git submodules"
         echo.
         echo endlocal

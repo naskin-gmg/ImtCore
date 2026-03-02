@@ -26,7 +26,7 @@ git submodule update
 echo Done! All submodules added.
 echo.
 echo IMPORTANT: Don't forget to commit the changes:
-echo   git add .gitmodules
+echo   git add .
 echo   git commit -m "Convert 3rdParty libraries to git submodules"
 echo   git push
 
