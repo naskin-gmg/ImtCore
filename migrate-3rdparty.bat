@@ -64,8 +64,15 @@ goto :main
         :: Add all files
         git add .
         
-        :: Create initial commit
-        git commit -m "Initial commit of %lib_name% library from ImtCore/3rdParty" -m "" -m "This library was extracted from the ImtCore repository to enable" -m "independent version control and easier dependency management." -m "" -m "Source: ImagingTools/ImtCore/3rdParty/%lib_name%"
+        :: Create initial commit with multi-line message
+        echo Initial commit of %lib_name% library from ImtCore/3rdParty > commit_msg.txt
+        echo. >> commit_msg.txt
+        echo This library was extracted from the ImtCore repository to enable >> commit_msg.txt
+        echo independent version control and easier dependency management. >> commit_msg.txt
+        echo. >> commit_msg.txt
+        echo Source: ImagingTools/ImtCore/3rdParty/%lib_name% >> commit_msg.txt
+        git commit -F commit_msg.txt
+        del commit_msg.txt
         
         call :print_info "Repository prepared at: %temp_repo%"
         call :print_info "To push to GitHub, run:"
@@ -147,6 +154,7 @@ goto :main
     
     (
         echo @echo off
+        echo setlocal enabledelayedexpansion
         echo.
         echo :: Script to add all 3rdParty libraries as git submodules
         echo :: Run this after creating and populating all GitHub repositories
@@ -163,7 +171,7 @@ goto :main
         echo     set "submodule_path=3rdParty/%%%%L"
         echo     
         echo     echo Adding %%%%L...
-        echo     git submodule add "!repo_url!" "!submodule_path!"
+        echo     git submodule add "^^!repo_url^^!" "^^!submodule_path^^!"
         echo ^)
         echo.
         echo echo Initializing and updating submodules...
@@ -173,6 +181,8 @@ goto :main
         echo echo Done! All submodules added.
         echo echo Don't forget to commit the changes:
         echo echo   git commit -m "Convert 3rdParty libraries to git submodules"
+        echo.
+        echo endlocal
     ) > "%script_file%"
     
     call :print_info "Created %script_file%"
