@@ -172,6 +172,8 @@ istd::IChangeableUniquePtr CCollectionImportParam::CloneMe(CompatibilityMode /*m
 
 bool CCollectionImportParam::ResetData(CompatibilityMode /*mode*/)
 {
+	istd::CChangeNotifier notifier(this);
+
 	m_collectionId.clear();
 	m_fileImportInfos.clear();
 
