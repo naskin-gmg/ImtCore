@@ -94,7 +94,7 @@ bool CCollectionImportParam::Serialize(iser::IArchive& archive)
 	retVal = retVal && archive.EndTag(collectionIdTag);
 
 	// Serialize file import infos
-	iser::CArchiveTag fileImportInfosTag("FileImportInfos", "File Import Infos", iser::CArchiveTag::TT_NODE);
+	iser::CArchiveTag fileImportInfosTag("FileImportInfos", "File Import Infos", iser::CArchiveTag::TT_GROUP);
 	retVal = retVal && archive.BeginTag(fileImportInfosTag);
 
 	int count = m_fileImportInfos.size();
@@ -108,7 +108,7 @@ bool CCollectionImportParam::Serialize(iser::IArchive& archive)
 	}
 
 	for (int i = 0; i < count && retVal; ++i){
-		iser::CArchiveTag itemTag("FileImportInfo", "File Import Info", iser::CArchiveTag::TT_NODE);
+		iser::CArchiveTag itemTag("FileImportInfo", "File Import Info", iser::CArchiveTag::TT_GROUP);
 		retVal = retVal && archive.BeginTag(itemTag);
 
 		iser::CArchiveTag filePathTag("FilePath", "File Path", iser::CArchiveTag::TT_LEAF);
