@@ -33,8 +33,21 @@ public:
 	virtual bool Serialize(iser::IArchive& archive) override;
 
 private:
+	class ParamsInfoProviderJoiner: virtual public iprm::IParamsInfoProvider
+	{
+	public:
+		ParamsInfoProviderJoiner(const CParamsSetJoiner* joiner);
+
+		// reimplemented (iprm::IParamsInfoProvider)
+		virtual const iprm::IParamInfo* GetParamInfo(const QByteArray& paramId) const override;
+
+	private:
+		const CParamsSetJoiner* m_joiner;
+	};
+
 	iprm::IParamsSet* m_paramsSet1;
 	iprm::IParamsSet* m_paramsSet2;
+	mutable ParamsInfoProviderJoiner m_infoProvider;
 };
 
 

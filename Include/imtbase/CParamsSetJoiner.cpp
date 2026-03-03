@@ -11,21 +11,24 @@ namespace imtbase
 
 CParamsSetJoiner::CParamsSetJoiner()
 	:m_paramsSet1(nullptr),
-	m_paramsSet2(nullptr)
+	m_paramsSet2(nullptr),
+	m_infoProvider(this)
 {
 }
 
 
 CParamsSetJoiner::CParamsSetJoiner(iprm::IParamsSet* paramsSet1, iprm::IParamsSet* paramsSet2)
 	:m_paramsSet1(paramsSet1),
-	m_paramsSet2(paramsSet2)
+	m_paramsSet2(paramsSet2),
+	m_infoProvider(this)
 {
 }
 
 
 CParamsSetJoiner::CParamsSetJoiner(const iprm::IParamsSet* paramsSet1, const iprm::IParamsSet* paramsSet2)
 	:m_paramsSet1(const_cast<iprm::IParamsSet*>(paramsSet1)),
-	m_paramsSet2(const_cast<iprm::IParamsSet*>(paramsSet2))
+	m_paramsSet2(const_cast<iprm::IParamsSet*>(paramsSet2)),
+	m_infoProvider(this)
 {
 }
 
@@ -105,21 +108,7 @@ iser::ISerializable* CParamsSetJoiner::GetEditableParameter(const QByteArray& id
 
 const iprm::IParamsInfoProvider* CParamsSetJoiner::GetParamsInfoProvider() const
 {
-	if (m_paramsSet1 != nullptr){
-		const iprm::IParamsInfoProvider* infoProviderPtr = m_paramsSet1->GetParamsInfoProvider();
-		if (infoProviderPtr != nullptr){
-			return infoProviderPtr;
-		}
-	}
-
-	if (m_paramsSet2 != nullptr){
-		const iprm::IParamsInfoProvider* infoProviderPtr = m_paramsSet2->GetParamsInfoProvider();
-		if (infoProviderPtr != nullptr){
-			return infoProviderPtr;
-		}
-	}
-
-	return nullptr;
+	return &m_infoProvider;
 }
 
 
@@ -128,6 +117,46 @@ const iprm::IParamsInfoProvider* CParamsSetJoiner::GetParamsInfoProvider() const
 bool CParamsSetJoiner::Serialize(iser::IArchive& /*archive*/)
 {
 	return false;
+}
+
+
+// ParamsInfoProviderJoiner implementation
+
+CParamsSetJoiner::ParamsInfoProviderJoiner::ParamsInfoProviderJoiner(const CParamsSetJoiner* joiner)
+	:m_joiner(joiner)
+{
+}
+
+
+const iprm::IParamInfo* CParamsSetJoiner::ParamsInfoProviderJoiner::GetParamInfo(const QByteArray& paramId) const
+{
+	if (m_joiner == nullptr){
+		return nullptr;
+	}
+
+	// Check if param belongs to m_paramsSet1
+	if (m_joiner->m_paramsSet1 != nullptr){
+		const iser::ISerializable* paramPtr = m_joiner->m_paramsSet1->GetParameter(paramId);
+		if (paramPtr != nullptr){
+			const iprm::IParamsInfoProvider* infoProviderPtr = m_joiner->m_paramsSet1->GetParamsInfoProvider();
+			if (infoProviderPtr != nullptr){
+				return infoProviderPtr->GetParamInfo(paramId);
+			}
+		}
+	}
+
+	// Check if param belongs to m_paramsSet2
+	if (m_joiner->m_paramsSet2 != nullptr){
+		const iser::ISerializable* paramPtr = m_joiner->m_paramsSet2->GetParameter(paramId);
+		if (paramPtr != nullptr){
+			const iprm::IParamsInfoProvider* infoProviderPtr = m_joiner->m_paramsSet2->GetParamsInfoProvider();
+			if (infoProviderPtr != nullptr){
+				return infoProviderPtr->GetParamInfo(paramId);
+			}
+		}
+	}
+
+	return nullptr;
 }
 
 
