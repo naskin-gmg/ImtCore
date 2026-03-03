@@ -3,6 +3,7 @@
 
 
 // ACF includes
+#include <istd/CChangeNotifier.h>
 #include <iser/IArchive.h>
 #include <iser/CArchiveTag.h>
 
@@ -24,6 +25,8 @@ QByteArray CCollectionImportParam::GetCollectionId() const
 bool CCollectionImportParam::SetCollectionId(const QByteArray& collectionId)
 {
 	if (m_collectionId != collectionId){
+		istd::CChangeNotifier notifier(this, &istd::IChangeable::GetAnyChange());
+
 		m_collectionId = collectionId;
 		return true;
 	}
@@ -51,6 +54,9 @@ bool CCollectionImportParam::InsertFileImportInfo(int index, const FileImportInf
 	if (index < 0 || index > m_fileImportInfos.size()){
 		return false;
 	}
+
+	istd::CChangeNotifier notifier(this, &istd::IChangeable::GetAnyChange());
+
 	m_fileImportInfos.insert(index, info);
 	return true;
 }
@@ -61,6 +67,9 @@ bool CCollectionImportParam::RemoveFileImportInfo(int index)
 	if (index < 0 || index >= m_fileImportInfos.size()){
 		return false;
 	}
+
+	istd::CChangeNotifier notifier(this, &istd::IChangeable::GetAnyChange());
+
 	m_fileImportInfos.remove(index);
 	return true;
 }
@@ -70,6 +79,8 @@ bool CCollectionImportParam::RemoveFileImportInfo(int index)
 
 bool CCollectionImportParam::Serialize(iser::IArchive& archive)
 {
+	istd::CChangeNotifier notifier(archive.IsStoring() ? nullptr : this, &istd::IChangeable::GetAllChanges());
+
 	bool retVal = true;
 
 	iser::CArchiveTag collectionIdTag("CollectionId", "Collection ID", iser::CArchiveTag::TT_LEAF);
