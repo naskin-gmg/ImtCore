@@ -77,18 +77,20 @@ bool CCollectionImportParamRepresentationControllerComp::GetDataModelFromSdlRepr
 	if (sdlRepresentation.fileImportInfos){
 		const imtsdl::TElementList<sdl::imtbase::ImtBaseTypes::CFileImportInfo::V1_0>& sdlFileImportInfos = *sdlRepresentation.fileImportInfos;
 		for (int i = 0; i < sdlFileImportInfos.size(); ++i){
-			const sdl::imtbase::ImtBaseTypes::CFileImportInfo::V1_0& sdlFileImportInfo = sdlFileImportInfos[i];
-			imtcol::ICollectionImportParam::FileImportInfo fileImportInfo;
-			if (sdlFileImportInfo.filePath){
-				fileImportInfo.filePath = *sdlFileImportInfo.filePath;
+			auto sdlFileImportInfo = sdlFileImportInfos[i];
+			if (sdlFileImportInfo){
+				imtcol::ICollectionImportParam::FileImportInfo fileImportInfo;
+				if (sdlFileImportInfo->filePath){
+					fileImportInfo.filePath = *sdlFileImportInfo->filePath;
+				}
+				if (sdlFileImportInfo->objectTypeId){
+					fileImportInfo.objectTypeId = *sdlFileImportInfo->objectTypeId;
+				}
+				if (sdlFileImportInfo->proposedId){
+					fileImportInfo.proposedId = *sdlFileImportInfo->proposedId;
+				}
+				collectionImportParamPtr->InsertFileImportInfo(fileImportInfo, i);
 			}
-			if (sdlFileImportInfo.objectTypeId){
-				fileImportInfo.objectTypeId = *sdlFileImportInfo.objectTypeId;
-			}
-			if (sdlFileImportInfo.proposedId){
-				fileImportInfo.proposedId = *sdlFileImportInfo.proposedId;
-			}
-			collectionImportParamPtr->InsertFileImportInfo(fileImportInfo, i);
 		}
 	}
 
