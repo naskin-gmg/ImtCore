@@ -4,6 +4,7 @@
 
 // ACF includes
 #include <iprm/IParamsSet.h>
+#include <iprm/IParamsInfoProvider.h>
 
 
 namespace imtbase
@@ -39,7 +40,7 @@ private:
 		ParamsInfoProviderJoiner(const CParamsSetJoiner* joiner);
 
 		// reimplemented (iprm::IParamsInfoProvider)
-		virtual const iprm::IParamInfo* GetParamInfo(const QByteArray& paramId) const override;
+		virtual std::unique_ptr<ParamInfo> GetParamInfo(const QByteArray& paramId) const override;
 
 	private:
 		const CParamsSetJoiner* m_joiner;

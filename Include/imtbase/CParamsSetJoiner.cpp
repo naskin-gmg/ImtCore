@@ -128,7 +128,7 @@ CParamsSetJoiner::ParamsInfoProviderJoiner::ParamsInfoProviderJoiner(const CPara
 }
 
 
-const iprm::IParamInfo* CParamsSetJoiner::ParamsInfoProviderJoiner::GetParamInfo(const QByteArray& paramId) const
+std::unique_ptr<iprm::IParamsInfoProvider::ParamInfo> CParamsSetJoiner::ParamsInfoProviderJoiner::GetParamInfo(const QByteArray& paramId) const
 {
 	// Check if param belongs to m_paramsSet1
 	if (m_joiner->m_paramsSet1 != nullptr){
