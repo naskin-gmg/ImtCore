@@ -39,7 +39,6 @@ public:
 
 	I_BEGIN_COMPONENT(CPersonalAccessTokenManagerGuiComp);
 		I_ASSIGN(m_loginCompPtr, "Login", "Login component to get current user ID", false, "Login");
-		I_ATTR(QByteArray, m_userIdAttrPtr);
 	I_END_COMPONENT;
 
 	CPersonalAccessTokenManagerGuiComp();
@@ -74,7 +73,6 @@ private Q_SLOTS:
 
 private:
 	I_REF(imtauth::ILogin, m_loginCompPtr);
-	I_ATTR(QByteArray, m_userIdAttrPtr);
 
 	QByteArray m_currentUserId;
 };

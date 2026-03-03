@@ -75,11 +75,7 @@ void CPersonalAccessTokenManagerGuiComp::OnGuiCreated()
 	DeleteTokenButton->setEnabled(false);
 	
 	// Load user ID from attribute or login component
-	if (m_userIdAttrPtr.IsValid() && !m_userIdAttrPtr->isEmpty()) {
-		m_currentUserId = *m_userIdAttrPtr;
-	} else if (m_loginCompPtr.IsValid()) {
-		m_currentUserId = m_loginCompPtr->GetLoggedUserId();
-	}
+	m_currentUserId = m_loginCompPtr->GetLoggedUserId();
 }
 
 
@@ -113,12 +109,8 @@ void CPersonalAccessTokenManagerGuiComp::RefreshTokenList()
 	}
 	
 	// Update user ID from attribute or login component
-	if (m_userIdAttrPtr.IsValid() && !m_userIdAttrPtr->isEmpty()) {
-		m_currentUserId = *m_userIdAttrPtr;
-	} else if (m_loginCompPtr.IsValid()) {
-		m_currentUserId = m_loginCompPtr->GetLoggedUserId();
-	}
-	
+	m_currentUserId = m_loginCompPtr->GetLoggedUserId();
+
 	if (m_currentUserId.isEmpty()) {
 		TokenListWidget->clear();
 		TokenDetailsText->clear();
@@ -181,8 +173,8 @@ void CPersonalAccessTokenManagerGuiComp::UpdateTokenDetails(const QByteArray& to
 	details += QString("<b>Last Used At:</b> %1<br>").arg(FormatDateTime(tokenPtr->GetLastUsedAt()));
 	details += QString("<b>Revoked:</b> %1<br>").arg(tokenPtr->IsRevoked() ? "Yes" : "No");
 	
-	if (tokenPtr->IsRevoked()) {
-		details += QString("<b>Revoked At:</b> %1<br>").arg(FormatDateTime(tokenPtr->GetRevokedAt()));
+	if (tokenPtr->IsRevoked()){
+		details += QString("<b>Revoked At:</b> %1<br>").arg(FormatDateTime(tokenPtr->GetExpiresAt()));
 	}
 	
 	TokenDetailsText->setHtml(details);
