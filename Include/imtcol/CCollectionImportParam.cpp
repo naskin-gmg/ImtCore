@@ -1,0 +1,124 @@
+// SPDX-License-Identifier: LGPL-2.1-or-later OR GPL-2.0-or-later OR GPL-3.0-or-later OR LicenseRef-ImtCore-Commercial
+#include <imtcol/CCollectionImportParam.h>
+
+
+// ACF includes
+#include <iser/IArchive.h>
+#include <iser/CArchiveTag.h>
+
+
+namespace imtcol
+{
+
+
+// public methods
+
+// reimplemented (imtcol::ICollectionImportParam)
+
+QByteArray CCollectionImportParam::GetCollectionId() const
+{
+	return m_collectionId;
+}
+
+
+bool CCollectionImportParam::SetCollectionId(const QByteArray& collectionId)
+{
+	if (m_collectionId != collectionId){
+		m_collectionId = collectionId;
+		return true;
+	}
+	return false;
+}
+
+
+int CCollectionImportParam::GetFileCount() const
+{
+	return m_fileImportInfos.size();
+}
+
+
+ICollectionImportParam::FileImportInfo* CCollectionImportParam::GetFileImportInfo(int index) const
+{
+	if (index < 0 || index >= m_fileImportInfos.size()){
+		return nullptr;
+	}
+	return &m_fileImportInfos[index];
+}
+
+
+bool CCollectionImportParam::InsertFileImportInfo(int index, const FileImportInfo& info)
+{
+	if (index < 0 || index > m_fileImportInfos.size()){
+		return false;
+	}
+	m_fileImportInfos.insert(index, info);
+	return true;
+}
+
+
+bool CCollectionImportParam::RemoveFileImportInfo(int index)
+{
+	if (index < 0 || index >= m_fileImportInfos.size()){
+		return false;
+	}
+	m_fileImportInfos.remove(index);
+	return true;
+}
+
+
+// reimplemented (iser::ISerializable)
+
+bool CCollectionImportParam::Serialize(iser::IArchive& archive)
+{
+	bool retVal = true;
+
+	iser::CArchiveTag collectionIdTag("CollectionId", "Collection ID", iser::CArchiveTag::TT_LEAF);
+	retVal = retVal && archive.BeginTag(collectionIdTag);
+	retVal = retVal && archive.Process(m_collectionId);
+	retVal = retVal && archive.EndTag(collectionIdTag);
+
+	// Serialize file import infos
+	iser::CArchiveTag fileImportInfosTag("FileImportInfos", "File Import Infos", iser::CArchiveTag::TT_NODE);
+	retVal = retVal && archive.BeginTag(fileImportInfosTag);
+
+	int count = m_fileImportInfos.size();
+	iser::CArchiveTag countTag("Count", "Count", iser::CArchiveTag::TT_LEAF);
+	retVal = retVal && archive.BeginTag(countTag);
+	retVal = retVal && archive.Process(count);
+	retVal = retVal && archive.EndTag(countTag);
+
+	if (!archive.IsStoring()){
+		m_fileImportInfos.resize(count);
+	}
+
+	for (int i = 0; i < count && retVal; ++i){
+		iser::CArchiveTag itemTag("FileImportInfo", "File Import Info", iser::CArchiveTag::TT_NODE);
+		retVal = retVal && archive.BeginTag(itemTag);
+
+		iser::CArchiveTag filePathTag("FilePath", "File Path", iser::CArchiveTag::TT_LEAF);
+		retVal = retVal && archive.BeginTag(filePathTag);
+		retVal = retVal && archive.Process(m_fileImportInfos[i].filePath);
+		retVal = retVal && archive.EndTag(filePathTag);
+
+		iser::CArchiveTag objectTypeIdTag("ObjectTypeId", "Object Type ID", iser::CArchiveTag::TT_LEAF);
+		retVal = retVal && archive.BeginTag(objectTypeIdTag);
+		retVal = retVal && archive.Process(m_fileImportInfos[i].objectTypeId);
+		retVal = retVal && archive.EndTag(objectTypeIdTag);
+
+		iser::CArchiveTag proposedIdTag("ProposedId", "Proposed ID", iser::CArchiveTag::TT_LEAF);
+		retVal = retVal && archive.BeginTag(proposedIdTag);
+		retVal = retVal && archive.Process(m_fileImportInfos[i].proposedId);
+		retVal = retVal && archive.EndTag(proposedIdTag);
+
+		retVal = retVal && archive.EndTag(itemTag);
+	}
+
+	retVal = retVal && archive.EndTag(fileImportInfosTag);
+
+	return retVal;
+}
+
+
+} // namespace imtcol
+
+
