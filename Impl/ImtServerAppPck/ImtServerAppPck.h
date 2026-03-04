@@ -33,6 +33,8 @@
 #include <imtserverapp/CEnableableParamRepresentationControllerComp.h>
 #include <imtserverapp/CServerConnectionParamRepresentationControllerComp.h>
 #include <imtserverapp/CCollectionImportParamRepresentationControllerComp.h>
+#include <imtserverapp/CIdParamRepresentationControllerComp.h>
+#include <imtserverapp/CParamsRepresentationControllerComp.h>
 
 
 /**
@@ -68,6 +70,8 @@ typedef imtserverapp::CEnableableParamRepresentationControllerComp EnableablePar
 typedef imtserverapp::CServerConnectionParamRepresentationControllerComp ServerConnectionParamRepresentationController;
 typedef imtserverapp::CCollectionImportParamRepresentationControllerComp CollectionImportParamRepresentationController;
 typedef imtbase::TComponentFactoryComp<imtserverapp::IJsonRepresentationController> RepresentationControllerFactory;
+typedef imtserverapp::CIdParamRepresentationControllerComp IdParamRepresentationController;
+typedef imtserverapp::CParamsRepresentationControllerComp ParamsRepresentationController;
 
 
 } // namespace ImtServerAppPck
