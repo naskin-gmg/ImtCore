@@ -2,6 +2,10 @@ const Property = require("./Property")
 const Signal = require("./Signal")
 
 class Var extends Property {
+    static getDefaultValue(){
+        return undefined
+    }
+
     __typecasting(value){
         if(typeof value === 'object') {
             if(value instanceof Property) return value.__get()
