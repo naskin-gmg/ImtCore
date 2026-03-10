@@ -2,6 +2,7 @@ const QBaseObject = require("../QtBase/QBaseObject")
 const Var = require("../QtQml/Var")
 const String = require("./String")
 const Signal = require("./Signal")
+const Alias = require("./Alias")
 
 class QObject extends QBaseObject {
     static meta = {
@@ -65,6 +66,7 @@ class QObject extends QBaseObject {
     }
 
     __children = []
+    __aliases = []
 
     hasOwnProperty(key){
 		return this.__self.constructor.meta[key] || super.hasOwnProperty(key)
@@ -105,6 +107,12 @@ class QObject extends QBaseObject {
         }
     }
 
+    __prepareAliasProperties(){
+        for(let name of this.__aliases){
+            let obj = this.__self[name].func()
+            Alias.prepare(this, name, obj, this.__self[name].propName)
+        }
+    }
 
     __updateProperty(propName){
         if(!(propName in this.__properties)) return
@@ -138,6 +146,8 @@ class QObject extends QBaseObject {
   
     __updateProperties(){
         JQApplication.beginUpdate()
+
+        this.__prepareAliasProperties()
 
         for(let i = this.__children.length-1; i >= 0; i--){
             this.__children[i].__updateProperties()
