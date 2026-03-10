@@ -79,6 +79,8 @@ class Alias extends Property {
             propName: propName,
             connected: false,
         }
+
+        target.__self.__aliases.push(name)
     }
 
     static prepare(target, name, obj, propName){

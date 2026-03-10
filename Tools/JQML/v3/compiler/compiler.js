@@ -1458,17 +1458,17 @@ class Instruction {
 
             if(signalName.indexOf('.') >= 0){
                 code.add(`'SLOT_${signalName}'(${connectedSignal.args.join(',')}){
-                    let __self = this
-                    let [${Array.from(ids).join(',')}] = [${Array.from(context).join(',')}]
                     if(super['SLOT_${signalName}']) super['SLOT_${signalName}'](...arguments)
                     if(!this.__${this.className}__${this.name}) return
+                    let __self = this
+                    let [${Array.from(ids).join(',')}] = [${Array.from(context).join(',')}]
                     try{JQApplication.beginUpdate();`)
             } else {
                 code.add(`SLOT_${signalName}(${connectedSignal.args.join(',')}){
-                    let __self = this
-                    let [${Array.from(ids).join(',')}] = [${Array.from(context).join(',')}]
                     if(super.SLOT_${signalName}) super.SLOT_${signalName}(...arguments)
                     if(!this.__${this.className}__${this.name}) return
+                    let __self = this
+                    let [${Array.from(ids).join(',')}] = [${Array.from(context).join(',')}]
                     try{JQApplication.beginUpdate();`)
             }
             

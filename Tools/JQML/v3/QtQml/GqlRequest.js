@@ -23,17 +23,29 @@ class GqlRequest extends QtObject {
             }
         }
 
-        xhr.send(gqlData)
-
         xhr.onreadystatechange = ()=>{
-            if(this.__destroyed) return
+            if (!this.__destroyed && xhr.readyState === XMLHttpRequest.DONE){
+				if (xhr.status === 401){
+					this.state = "Unauthorized"
+				}
+				
+				if (xhr.status === 403){
+					this.state = "Forbidden"
+				}
+				
+				if (xhr.status === 200){
+					this.json = xhr.responseText
+					if (this.state === "Ready"){
+						this.state = "Loading"
+					}
+					
+					this.state = "Ready"
+				}
+			}
 
-            if (xhr.readyState === XMLHttpRequest.DONE){
-                this.json = xhr.responseText;
-
-                this.state = "Ready";
-            }
         }
+
+        xhr.send(gqlData)
     }
 }
 
