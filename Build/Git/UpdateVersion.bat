@@ -42,3 +42,4 @@ set "OUT=%FILE:.xtrsvn=%"
 echo Wrote %OUT% with WCREV=%REV_OFFSET% and WCMODS=%DIRTY%
 
 endlocal
+exit /b 0
