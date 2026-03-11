@@ -43,7 +43,9 @@ imtbase::CTreeItemModel* CGqlRemoteRepresentationControllerCompBase::CreateInter
 
 // private methods
 
-imtbase::CTreeItemModel* CGqlRemoteRepresentationControllerCompBase::CreateTreeItemModelFromResponse(const QByteArray& commandId, const imtgql::IGqlResponse& response) const
+imtbase::CTreeItemModel* CGqlRemoteRepresentationControllerCompBase::CreateTreeItemModelFromResponse(
+			const QByteArray& commandId,
+			const imtgql::IGqlResponse& response) const
 {
 	istd::TDelPtr<imtbase::CTreeItemModel> retVal(new imtbase::CTreeItemModel());
 	QByteArray responseData = response.GetResponseData();
@@ -56,14 +58,15 @@ imtbase::CTreeItemModel* CGqlRemoteRepresentationControllerCompBase::CreateTreeI
 			return nullptr;
 		}
 
+		// --- Errors (new format: array) ---
 		if (dataObject.contains("errors")){
 			QJsonValue jsonValue = dataObject.value("errors");
-			if (jsonValue.isObject()){
-				QJsonObject errorObj = jsonValue.toObject();
-				if (errorObj.contains(requestPtr->GetCommandId())){
-					QJsonValue bodyValue = errorObj.value(requestPtr->GetCommandId());
+			if (jsonValue.isArray()){
+				QJsonArray errorArray = jsonValue.toArray();
+				if (!errorArray.isEmpty()){
+					QJsonValue firstError = errorArray.first();
 					dataObject = QJsonObject();
-					dataObject.insert("errors", bodyValue);
+					dataObject.insert("errors", firstError);
 					document.setObject(dataObject);
 					QByteArray parserData = document.toJson(QJsonDocument::Compact);
 					retVal->CreateFromJson(parserData);
@@ -71,6 +74,7 @@ imtbase::CTreeItemModel* CGqlRemoteRepresentationControllerCompBase::CreateTreeI
 			}
 		}
 
+		// --- Data ---
 		dataObject = document.object().value("data").toObject();
 		if (!dataObject.isEmpty()){
 			QJsonValue bodyValue = dataObject.value(requestPtr->GetCommandId());
@@ -83,18 +87,30 @@ imtbase::CTreeItemModel* CGqlRemoteRepresentationControllerCompBase::CreateTreeI
 			}
 		}
 
+		// --- WebSocket / subscription payloads ---
 		if (document.object().value("type").toString() == "query_data"){
 			QJsonObject payloadObject = document.object().value("payload").toObject();
 
 			QJsonValue dataValue;
 			QString type = "data";
+
 			if (payloadObject.contains("data")){
-				dataValue = payloadObject.value("data").toObject().value(commandId);
+				QJsonObject payloadData = payloadObject.value("data").toObject();
+				dataValue = payloadData.value(commandId);
 			}
+
 			if (payloadObject.contains("errors")){
 				type = "errors";
-				dataValue = payloadObject.value("errors").toObject().value(commandId);
+				QJsonValue payloadErrors = payloadObject.value("errors");
+
+				if (payloadErrors.isArray()){
+					QJsonArray errorArray = payloadErrors.toArray();
+					if (!errorArray.isEmpty()){
+						dataValue = errorArray.first();
+					}
+				}
 			}
+
 			if (!dataValue.isNull()){
 				QJsonObject newDataObject;
 				newDataObject.insert(type, dataValue);
