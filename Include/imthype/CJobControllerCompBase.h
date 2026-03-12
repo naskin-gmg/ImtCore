@@ -31,14 +31,14 @@ public:
 		I_ASSIGN(m_jobQueueManagerCompPtr, "JobQueueManager", "Job queue manager", false, "JobQueueManager");
 		I_ASSIGN(m_inputCollectionCompPtr, "InputCollection", "Input collection", false, "InputCollection");
 		I_ASSIGN(m_resultCollectionCompPtr, "ResultCollection", "Result collection", false, "ResultCollection");
-		I_ASSIGN(m_jobParamsCompPtr , "JobParams", "Job params", false, "JobParams");
+		I_ASSIGN(m_jobParamsFactPtr , "JobParams", "Job params factory", false, "JobParams");
 	I_END_COMPONENT;
 
 	CJobControllerCompBase();
 
 	// reimplemented (IJobController)
-	virtual typename IJobController::RequestStatus BeginJob(const QByteArray& jobId, istd::TUniqueInterfacePtr<iprm::IParamsSet> jobParams) override;
-	virtual JobResultPtr GetJobResult(const QByteArray& jobId) const override;
+	virtual typename IJobController::RequestStatus BeginJob(const QByteArray& jobId, const iprm::IParamsSet* jobParams) override;
+	virtual istd::IChangeableUniquePtr GetJobResult(const QByteArray& jobId) const override;
 	virtual typename IJobController::JobStatus GetJobStatus(const QByteArray& jobId) const override;
 	virtual typename IJobController::RequestStatus CancelJob(const QByteArray& jobId) override;
 	virtual typename IJobController::RequestStatus RemoveJob(const QByteArray& jobId) override;
@@ -48,8 +48,8 @@ protected:
 	{
 		QByteArray queueJobId;
 
-		JobParamsPtr paramsPtr;
-		JobResultPtr resultPtr;
+		iprm::IParamsSetUniquePtr paramsPtr;
+		istd::IChangeableUniquePtr resultPtr;
 		typename IJobController::JobStatus status = IJobController::JS_FAILED;
 
 		ibase::IProgressManager* jobProgressManagerPtr = nullptr;
@@ -87,7 +87,7 @@ private:
 	I_ATTR(QByteArray, m_defaultJobTypeIdAttrPtr);
 	I_REF(imtbase::IProgressSessionsManager, m_progressSessionManagerCompPtr);
 	I_REF(IJobQueueManager, m_jobQueueManagerCompPtr);
-	I_FACT(iprm::IParamsSet, m_jobParamsCompPtr);
+	I_FACT(iprm::IParamsSet, m_jobParamsFactPtr);
 
 	imtbase::TModelUpdateBinder<IJobQueueManager, CJobControllerCompBase> m_jobQueueObserver;
 };

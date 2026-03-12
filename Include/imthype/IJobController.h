@@ -30,9 +30,6 @@ public:
 		JS_FAILED
 	};
 
-	using JobResultPtr = istd::TUniqueInterfacePtr<istd::IChangeable>;
-	using JobParamsPtr = istd::TUniqueInterfacePtr<iprm::IParamsSet>;
-
 	/**
 		Get status of the job with given ID
 	*/
@@ -41,7 +38,7 @@ public:
 	/**
 		Begin new job with given params
 	*/
-	virtual RequestStatus BeginJob(const QByteArray& jobId, JobParamsPtr jobParams) = 0;
+	virtual RequestStatus BeginJob(const QByteArray& jobId, const iprm::IParamsSet* jobParams) = 0;
 
 	/**
 		Cancel the execution of the job with given ID
@@ -57,7 +54,7 @@ public:
 	/**
 		Get the result of the job execution with given ID. Non-null if the job was successfully completed
 	*/
-	virtual JobResultPtr GetJobResult(const QByteArray& jobId) const = 0;
+	virtual istd::IChangeableUniquePtr GetJobResult(const QByteArray& jobId) const = 0;
 };
 
 

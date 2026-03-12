@@ -28,25 +28,25 @@ CJobControllerCompBase::CJobControllerCompBase()
 
 // reimplemented (imtservergql::ICollectionImportController)
 
-IJobController::RequestStatus CJobControllerCompBase::BeginJob(const QByteArray& jobId, JobParamsPtr jobParams)
+IJobController::RequestStatus CJobControllerCompBase::BeginJob(const QByteArray& jobId, const iprm::IParamsSet* jobParams)
 {
-	if (!jobParams.IsValid()){
-		return RS_FAILED;
-	}
-
-	if (m_jobQueueManagerCompPtr.IsValid() && m_jobParamsCompPtr.IsValid()){
+	if (m_jobQueueManagerCompPtr.IsValid() && m_jobParamsFactPtr.IsValid()){
 		QMutexLocker locker(&m_mutex);
 
 		if (!m_jobs.contains(jobId)){
+			iprm::IParamsSetUniquePtr jobParamsPtr = m_jobParamsFactPtr.CreateInstance();
+			Q_ASSERT(jobParamsPtr.IsValid());
+
+			if (jobParams == nullptr || !jobParamsPtr->CopyFrom(*jobParams)){
+				return RS_FAILED;
+			}
+
 			JobInfoPtr jobPtr(new JobInfo);
-			jobPtr->paramsPtr.MoveCastedPtr(jobParams);
+			jobPtr->paramsPtr.MoveCastedPtr(jobParamsPtr);
 			jobPtr->status = IJobController::JS_IN_PROGRESS;
 
-			istd::TUniqueInterfacePtr<iprm::IParamsSet> jobParamsPtr;
-			jobParamsPtr = m_jobParamsCompPtr.CreateInstance();
-
 			if (PrepareInputObjects(*jobPtr)){
-				jobPtr->queueJobId = m_jobQueueManagerCompPtr->InsertNewJobIntoQueue(jobId, *m_defaultJobTypeIdAttrPtr, jobPtr->inputRefCollection, jobParamsPtr.GetPtr());
+				jobPtr->queueJobId = m_jobQueueManagerCompPtr->InsertNewJobIntoQueue(jobId, *m_defaultJobTypeIdAttrPtr, jobPtr->inputRefCollection, jobPtr->paramsPtr.GetPtr());
 				if (!jobPtr->queueJobId.isEmpty()){
 					jobPtr->status = IJobController::JS_IN_PROGRESS;
 
@@ -69,11 +69,11 @@ IJobController::RequestStatus CJobControllerCompBase::BeginJob(const QByteArray&
 }
 
 
-IJobController::JobResultPtr CJobControllerCompBase::GetJobResult(const QByteArray& jobId) const
+istd::IChangeableUniquePtr CJobControllerCompBase::GetJobResult(const QByteArray& jobId) const
 {
 	QMutexLocker locker(&m_mutex);
 
-	JobResultPtr retVal;
+	istd::IChangeableUniquePtr retVal;
 
 	if (m_jobs.contains(jobId)){
 		if (m_jobs[jobId]->resultPtr.IsValid()){
@@ -107,7 +107,7 @@ IJobController::RequestStatus CJobControllerCompBase::CancelJob(const QByteArray
 		//}
 
 		//m_jobs.remove(jobId);
-		if (m_jobQueueManagerCompPtr.IsValid() && m_jobParamsCompPtr.IsValid()){
+		if (m_jobQueueManagerCompPtr.IsValid()){
 			if (m_jobQueueManagerCompPtr->CancelJob(m_jobs[jobId]->queueJobId)){
 				return IJobController::RS_SUCCESS;
 			}
