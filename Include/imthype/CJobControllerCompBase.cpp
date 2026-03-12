@@ -37,7 +37,7 @@ IJobController::RequestStatus CJobControllerCompBase::BeginJob(const QByteArray&
 			iprm::IParamsSetUniquePtr jobParamsPtr = m_jobParamsFactPtr.CreateInstance();
 			Q_ASSERT(jobParamsPtr.IsValid());
 
-			if (jobParams == nullptr || !jobParamsPtr->CopyFrom(*jobParams)){
+			if (jobParams != nullptr && !jobParamsPtr->CopyFrom(*jobParams)){
 				return RS_FAILED;
 			}
 
