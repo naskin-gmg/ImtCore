@@ -28,7 +28,7 @@ StyleComponents {
 	property real mainSize;
 
 	property string theme: "Light";
-
+	property string logoIconName;
 	property string language;//deprecated?
 
 	//Font properties
